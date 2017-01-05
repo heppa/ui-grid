@@ -85,8 +85,8 @@
                  * @param {scope} $scope a scope that we can broadcast on
                  * @param {object} state the state that should be restored into the grid
                  */
-                restore: function ( $scope, state) {
-                  service.restore(grid, $scope, state);
+                restore: function ( $scope, state, triggerEvents) {
+                  service.restore(grid, $scope, state, triggerEvents);
                 }
               }
             }
@@ -303,29 +303,29 @@
          * @param {scope} $scope a scope that we can broadcast on
          * @param {object} state the state we'd like to restore
          */
-        restore: function( grid, $scope, state ){
+        restore: function( grid, $scope, state, triggerEvents){
           if ( state.columns ) {
-            service.restoreColumns( grid, state.columns );
+            service.restoreColumns( grid, state.columns, triggerEvents);
           }
 
           if ( state.scrollFocus ){
-            service.restoreScrollFocus( grid, $scope, state.scrollFocus );
+            service.restoreScrollFocus( grid, $scope, state.scrollFocus);
           }
 
           if ( state.selection ){
-            service.restoreSelection( grid, state.selection );
+            service.restoreSelection( grid, state.selection);
           }
 
           if ( state.grouping ){
-            service.restoreGrouping( grid, state.grouping );
+            service.restoreGrouping( grid, state.grouping);
           }
 
           if ( state.treeView ){
-            service.restoreTreeView( grid, state.treeView );
+            service.restoreTreeView( grid, state.treeView);
           }
 
           if ( state.pagination ){
-            service.restorePagination( grid, state.pagination );
+            service.restorePagination( grid, state.pagination);
           }
 
           grid.refresh();
@@ -554,7 +554,7 @@
          * @param {Grid} grid the grid whose state we'd like to restore
          * @param {object} columnsState the list of columns we had before, with their state
          */
-        restoreColumns: function( grid, columnsState ){
+        restoreColumns: function( grid, columnsState, triggerEvents){
           var isSortChanged = false;
 
           columnsState.forEach( function( columnState, index ) {
@@ -566,7 +566,9 @@
                      currentCol.colDef.visible !== columnState.visible ) ){
                 currentCol.visible = columnState.visible;
                 currentCol.colDef.visible = columnState.visible;
-                grid.api.core.raise.columnVisibilityChanged(currentCol);
+                if(triggerEvents){
+                  grid.api.core.raise.columnVisibilityChanged(currentCol);
+                }
               }
 
               if ( grid.options.saveWidths && currentCol.width !== columnState.width){
@@ -589,7 +591,9 @@
                     delete currentCol.filters[index].term;
                   }
                 });
-                grid.api.core.raise.filterChanged();
+                if(triggerEvents){
+                  grid.api.core.raise.filterChanged();
+                }
               }
 
               if ( !!grid.api.pinning && grid.options.savePinning && currentCol.renderContainer !== columnState.pinned ){
@@ -606,7 +610,7 @@
             }
           });
 
-          if ( isSortChanged ) {
+          if ( isSortChanged && triggerEvents ) {
             grid.api.core.raise.sortChanged( grid, grid.getColumnSorting() );
           }
         },
