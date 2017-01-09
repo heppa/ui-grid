@@ -182,6 +182,7 @@
            *
            * <br/>Defaults to undefined
            */
+
           /**
            * @ngdoc object
            * @name saveVisible
@@ -191,6 +192,17 @@
            * <br/>Defaults to true
            */
           gridOptions.saveVisible = gridOptions.saveVisible !== false;
+
+          /**
+           * @ngdoc object
+           * @name saveDisplayNames
+           * @propertyOf  ui.grid.saveState.api:GridOptions
+           * @description Save columns displayNames.
+           *
+           * <br/>Defaults to true
+           */
+          gridOptions.saveDisplayNames = gridOptions.saveDisplayNames !== false;
+
           /**
            * @ngdoc object
            * @name saveSort
@@ -357,6 +369,10 @@
 
             if ( grid.options.saveWidths ){
               savedColumn.width = column.width;
+            }
+
+            if ( grid.options.saveDisplayNames ){
+              savedColumn.displayName = column.displayName;
             }
 
             // these two must be copied, not just pointed too - otherwise our saved state is pointing to the same object as current state
@@ -569,6 +585,11 @@
                 if(triggerEvents){
                   grid.api.core.raise.columnVisibilityChanged(currentCol);
                 }
+              }
+
+              if ( grid.options.saveDisplayNames){
+                currentCol.displayName = columnState.displayName;
+                currentCol.colDef.displayName = columnState.displayName;
               }
 
               if ( grid.options.saveWidths && currentCol.width !== columnState.width){
